@@ -33,7 +33,8 @@ class BaumWelch:
 
         for i in range(len(sequence)):
             for state in range(2):
-                f[state][i] += ((f[0][i - 1] * self.tmat[0][state]) + (f[1][i - 1] * self.tmat[1][state])) * self.emat[state][e_probs[i]]
+                f[state][i] += ((f[0][i - 1] * self.tmat[0][state]) + (f[1][i - 1] * self.tmat[1][state])) * \
+                               self.emat[state][e_probs[i]]
         return f, (f[0, :] + f[1, :])[-1]
 
     def backward(self, sequence):
@@ -72,13 +73,15 @@ class BaumWelch:
                     E[1][self.atgc[seq[i]]] = E[1][self.atgc[seq[i]]] + f[1][i] * b[1][i] / P
 
                     for a in range(2):
-                        A[a, 0] += (1/P) * f[a][i] * self.tmat[a][0] * self.emat[0][self.atgc[seq[i + 1]]] * b[0][i + 1]
-                        A[a, 1] += (1/P) * f[a][i] * self.tmat[a][1] * self.emat[1][self.atgc[seq[i + 1]]] * b[1][i + 1]
+                        A[a, 0] += (1 / P) * f[a][i] * self.tmat[a][0] * self.emat[0][self.atgc[seq[i + 1]]] * b[0][
+                            i + 1]
+                        A[a, 1] += (1 / P) * f[a][i] * self.tmat[a][1] * self.emat[1][self.atgc[seq[i + 1]]] * b[1][
+                            i + 1]
 
-            self.tmat[0] = A[0] / sum(A[0])
-            self.emat[0] = E[0] / sum(E[0])
-            self.tmat[1] = A[1] / sum(A[1])
-            self.emat[1] = E[1] / sum(E[1])
+            self.tmat[0, :] = A[0, :] / sum(A[0, :])
+            self.emat[0, :] = E[0, :] / sum(E[0, :])
+            self.tmat[1, :] = A[1, :] / sum(A[1, :])
+            self.emat[1, :] = E[1, :] / sum(E[1, :])
 
             diff = 0.
             for i in range(len(self.sequences)):
@@ -90,7 +93,6 @@ class BaumWelch:
 
     def calculate_pi_k_given_x(self, f, b, P):
         return (np.multiply(f, b) / P)[0]
-
 
     # TODO: SOMEHOW TWO PLOT WINDOWS OPEN, I DO NOT KNOW WHY :(
     def print_results(self, f, b, P):
